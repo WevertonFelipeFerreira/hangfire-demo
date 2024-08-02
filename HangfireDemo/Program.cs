@@ -1,4 +1,5 @@
 using Hangfire;
+using HangfireDemo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddHangfire((sp, config) =>
     config.UseSqlServerStorage(connectionString);
 });
 builder.Services.AddHangfireServer();
+
+builder.Services.AddScoped<IReplicationService, ReplicationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -26,6 +29,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHangfireDashboard();
+
+var jobManager = app.Services.GetService<IRecurringJobManager>();
+var jobClient = app.Services.GetService<IBackgroundJobClient>();
+
+jobManager.AddOrUpdate<IReplicationService>("replications", x => x.ReplicateAll(), "*/15 * * * * *");
 
 app.UseHttpsRedirection();
 
