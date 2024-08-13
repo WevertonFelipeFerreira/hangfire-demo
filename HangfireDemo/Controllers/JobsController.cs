@@ -20,7 +20,7 @@ namespace HangfireDemo.Controllers
         [HttpGet("fire-forget2")]
         public IActionResult FireForget2([FromServices] IBackgroundJobClient client)
         {
-            client.Enqueue<IReplicationService>(us => us.ReplicateAll());
+            client.Enqueue<ImagesService>(us => us.ProcessImages());
 
             return Ok();
         }

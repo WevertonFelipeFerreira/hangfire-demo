@@ -12,7 +12,7 @@ builder.Services.AddHangfire((sp, config) =>
 });
 builder.Services.AddHangfireServer();
 
-builder.Services.AddScoped<IReplicationService, ReplicationService>();
+builder.Services.AddScoped<IImagesService, ImagesService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -31,9 +31,8 @@ if (app.Environment.IsDevelopment())
 app.UseHangfireDashboard();
 
 var jobManager = app.Services.GetService<IRecurringJobManager>();
-var jobClient = app.Services.GetService<IBackgroundJobClient>();
 
-jobManager.AddOrUpdate<IReplicationService>("replications", x => x.ReplicateAll(), "*/15 * * * * *");
+jobManager.AddOrUpdate<IImagesService>("images-process", x => x.ProcessImages(), "*/30 * * * * *");
 
 app.UseHttpsRedirection();
 
